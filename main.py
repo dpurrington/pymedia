@@ -86,13 +86,17 @@ def find(**kwargs):
     glob = kwargs["glob"]
     files = get_file_info(glob)
     dups = find_dups(files)
-    if len(dups) == 0:
+    print_text(dups)
+
+
+def print_text(data):
+    if len(data) == 0:
         print("No duplicate files found.")
     else:
         print(
-            "Duplicate files (all of these are copies of other files not in this list and can be safely removed):"
+            "Duplicate files (all of these are copies of other files not in this list and are safe to be removed):"
         )
-        for k, v in dups.values():
+        for k, v in data.values():
             print(v)
 
 
