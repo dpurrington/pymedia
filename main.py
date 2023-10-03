@@ -85,13 +85,16 @@ def main():
 @click.argument("glob")
 def find(**kwargs):
     glob = kwargs["glob"]
-    print(f"glob is {glob}")
     files = get_file_info(glob)
     dups = find_dups(files)
     if len(dups) == 0:
         print("No duplicate files found.")
     else:
-        print(dups)
+        print(
+            "Duplicate files (all of these are copies of other files not in this list and can be safely removed):"
+        )
+        for k, v in dups.values():
+            print(v)
 
 
 @main.command()
@@ -103,6 +106,7 @@ def coalesce(**kwargs):
 
 @main.command()
 @click.argument("glob")
+@click.option("--dry-run", is_flag=True)
 def dedup(**kwargs):
     glob = kwargs["glob"]
     files = get_file_info(glob)
@@ -110,16 +114,18 @@ def dedup(**kwargs):
     if len(dups) == 0:
         print("No duplicate files found.")
     else:
-        # prune_dups(dups)
-        pass
+        if kwargs["dry_run"]:
+            print("Dry run, would have deleted:")
+            for k, v in dups.values():
+                print(v)
+        else:
+            prune_dups(dups)
+            pass
 
 
 if __name__ == "__main__":
     main()
     # TODO: use logging
-    # TODO: add dry run option
     # TODO: add stats
     # TODO: add quarantine option
-    # TODO: add coalesce command
     # TODO: add report command
-    # TODO: add dedup command
