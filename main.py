@@ -11,7 +11,7 @@ def find_files(input_glob):
     return [p for p in paths if os.path.isfile(p)]
 
 
-def hash_file(file_path, hash_algorithm="sha256"):
+def hash_file(file_path):
     """
         Compute the hash (default: SHA-256) of a file.
 
@@ -23,21 +23,13 @@ def hash_file(file_path, hash_algorithm="sha256"):
         str: The computed hash value in hexadecimal format.
     """
     try:
-        # Create a hash object based on the specified algorithm
-        hasher = hashlib.new(hash_algorithm)
-
         # Read the file in binary mode and update the hash object
         with open(file_path, "rb") as file:
-            while True:
-                data = file.read(8192)  # Read the file in chunks
-                if not data:
-                    break
-                hasher.update(data)
+            digest = hashlib.file_digest(file, "sha256")
 
-        # Return the hexadecimal representation of the hash
-        digest = hasher.hexdigest()
         # print(f"Processing {file_path}: {digest}")
-        return file_path, digest
+        return file_path, digest.hexdigest()
+
     except Exception as e:
         print(f"Error hashing the file: {e}")
         return None
@@ -96,8 +88,12 @@ def print_text(data):
         print(
             "Duplicate files (all of these are copies of other files not in this list and are safe to be removed):"
         )
-        for k, v in data.values():
-            print(v)
+        for k, v in data.items():
+            if isinstance(v, str):
+                print(v)
+            else:
+                for f in v:
+                    print(f)
 
 
 @main.command()
@@ -145,3 +141,4 @@ if __name__ == "__main__":
     # TODO: add stats
     # TODO: add quarantine option
     # TODO: add report command
+    # TODO: cache digest info for faster execution
