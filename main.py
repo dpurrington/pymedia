@@ -118,7 +118,6 @@ def coalesce(**kwargs):
 
 @main.command()
 @click.argument("glob")
-@click.option("--dry-run", is_flag=True)
 def dedup(**kwargs):
     glob = kwargs["glob"]
     files = get_file_info(glob)
@@ -126,13 +125,7 @@ def dedup(**kwargs):
     if len(dups) == 0:
         print("No duplicate files found.")
     else:
-        if kwargs["dry_run"]:
-            print("Dry run, would have deleted:")
-            for k, v in dups.values():
-                print(v)
-        else:
-            prune_dups(dups)
-            pass
+        prune_dups(dups)
 
 
 if __name__ == "__main__":
