@@ -1,5 +1,4 @@
 import glob
-import argparse
 import hashlib
 import os.path
 import concurrent.futures
@@ -99,9 +98,22 @@ def find(**kwargs):
 
 @main.command()
 @click.argument("glob")
+@click.argument("output")
 def coalesce(**kwargs):
     glob = kwargs["glob"]
-    print(f"glob is {glob}")
+    output_path = kwargs["output"]
+    files = find_files(glob)
+    for f in files:
+        basename = os.path.basename(f)
+        target = os.path.join(output_path, basename)
+        (root, ext) = os.path.splitext(target)
+        fixed_target = target
+        i = 0
+        while os.path.exists(fixed_target):
+            i = i + 1
+            fixed_target = f"{root}-{str(i)}{ext}"
+        print(f"Moving {f} to {fixed_target}")
+        os.rename(f, fixed_target)
 
 
 @main.command()
